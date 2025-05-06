@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
-from docparser.api import app
+from verdictpdf.api import app
+
 
 client = TestClient(app)
 

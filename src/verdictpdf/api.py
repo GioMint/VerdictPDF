@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, Query, Depends
 import tempfile
-import extractor
+from . import extractor
 from auth import credits_guard
 
 app = FastAPI(title="PDF-to-JSON Service")
