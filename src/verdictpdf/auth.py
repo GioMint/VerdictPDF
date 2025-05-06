@@ -1,17 +1,11 @@
-"""
-Minimal placeholder for token validation.
-
-* Accept the hard-coded key  DEV-KEY  (so the demo still works)
-* Everything else is rejected ⇒ caller gets 401
-"""
-from fastapi import Header, HTTPException, status
+from fastapi import Header, HTTPException, status, Depends
+from .credits import charge
 
 def credits_guard(
-    x_api_key: str = Header(..., alias="X-API-KEY")   # ← match the header
+    x_api_key: str = Header(..., alias="X-API-KEY"),
+    pages: int | None = None                     # filled later via dependency
 ) -> None:
-    """Reject any key except the built-in DEV-KEY (demo only)."""
-    if x_api_key != "DEV-KEY":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid API key",
-        )
+    try:
+        charge(x_api_key, pages or 0)            # 0 for validation pass
+    except ValueError:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid API key")

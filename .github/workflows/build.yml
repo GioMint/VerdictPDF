@@ -1,17 +1,45 @@
-[project]
-name = "verdictpdf"
-version = "0.1.0"
-description = "A PDF verdict generator"
-authors = [
-    { name="Giomint", email="giomint@example.com" }
-]
+name: Build & Publish Docker image
 
-[tool.setuptools]
-package-dir = {"" = "src"}
+on:
+  push:
+    branches: [main]     # build on each push to main
+  workflow_dispatch:     # …and allow manual runs
 
-[tool.setuptools.packages.find]
-where = ["src"]
+env:
+  IMAGE_NAME: verdictpdf
+  REGISTRY: ghcr.io
+  OWNER: giomint
 
-[build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write      # needed to push to GHCR
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU (multi-arch)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          platforms: linux/amd64,linux/arm64

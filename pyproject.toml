@@ -1,7 +1,10 @@
 [project]
 name = "verdictpdf"
 version = "0.1.0"
+description = "Light‑weight PDF‑to‑JSON micro‑service"
+authors = [{ name = "GioMint" }]
 requires-python = ">=3.9"
+
 dependencies = [
     "fastapi",
     "pdfplumber",
@@ -9,6 +12,12 @@ dependencies = [
     "python-multipart"
 ]
 
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
