@@ -1,2 +1,5 @@
 __pycache__/
 src/*.egg-info/
+# runtime files
+credits.json
+*.pdf
