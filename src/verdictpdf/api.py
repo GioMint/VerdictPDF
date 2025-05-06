@@ -8,6 +8,9 @@ import os
 import tempfile
 from pathlib import Path
 
+import logging
+from time import perf_counter
+
 # ⬇️ split the long FastAPI import so we can add Header cleanly
 from fastapi import (
     Depends,
@@ -16,10 +19,14 @@ from fastapi import (
     Header,              #  ← NEW
     HTTPException,
     Query,
+    Request,
     UploadFile,
     status,
 )
 from fastapi.responses import JSONResponse
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logger = logging.getLogger("verdictpdf")
 
 from .auth import credits_guard
 from . import extractor
@@ -27,6 +34,18 @@ from .credits import charge       #  ← NEW
 
 app = FastAPI(title="VerdictPDF API")
 
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start = perf_counter()
+    response = await call_next(request)
+    duration_ms = (perf_counter() - start) * 1000
+    logger.info("%s %s -> %d %.1f ms",
+                request.method, request.url.path, response.status_code, duration_ms)
+    return response
+
+@app.get("/healthz", summary="Health check")
+async def healthz():
+    return {"status": "ok"}
 
 @app.post(
     "/convert",
