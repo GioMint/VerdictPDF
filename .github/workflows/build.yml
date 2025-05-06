@@ -1,0 +1,17 @@
+[project]
+name = "verdictpdf"
+version = "0.1.0"
+description = "A PDF verdict generator"
+authors = [
+    { name="Giomint", email="giomint@example.com" }
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
