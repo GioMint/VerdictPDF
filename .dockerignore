@@ -1,0 +1,5 @@
+.git
+tests
+*.pyc
+__pycache__/
+src/*.egg-info/
